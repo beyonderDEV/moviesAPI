@@ -1,0 +1,4 @@
+.vscode
+serialAPI
+api/database.db
+__pycache__
