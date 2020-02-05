@@ -8,18 +8,20 @@ main = Blueprint('main', __name__)
 def index():
     return render_template('welcome.html')
 
+@main.route('/add_movie')
+def add_movie():
+       return render_template('add_movie.html')
 
-@main.route('/add_movie', methods=['POST', 'GET'])
+@main.route('/add_movie', methods=['POST'])
 def add_movie_post():
-    if request.method == 'POST':
-        title = request.form.get('movie_title')
-        rating = int(request.form.get('rating'))
-        description = request.form.get('desc')
-        movie_new = Movie(title=title, rating=rating, description=description)
-        db.session.add(movie_new)
-        db.session.commit()
-        return redirect(url_for('main.movies')), 201
-    return render_template('add_movie.html')
+    title = request.form.get('movie_title')
+    rating = int(request.form.get('rating'))
+    description = request.form.get('desc')
+    movie_new = Movie(title=title, rating=rating, description=description)
+    db.session.add(movie_new)
+    db.session.commit()
+    return redirect(url_for('main.movies'))
+ 
 
 
 @main.route('/remove_movie/')
@@ -56,3 +58,29 @@ def description(id):
         if movie.id == id:
             result = {'desc: ': movie.description}
     return jsonify({'movie': result})
+
+
+@main.route('/update')
+def update_movie():
+    return render_template("update_movie.html")
+
+
+@main.route('/update', methods=["POST"])
+def update_movie_post():
+    id = request.form.get('id')
+    movie = Movie.query.filter(Movie.id == id).first()
+    if movie:
+        new_title = request.form.get('movie_title')
+        new_rating = request.form.get('rating')
+        new_desc = request.form.get('desc')
+        if new_title:
+            movie.title = new_title
+        if new_rating:
+            movie.rating = int(new_rating)
+        if new_desc:
+            movie.desc = new_desc
+        db.session.commit()
+        print("Updated successfully!")
+    else:
+        print("There is no movie with such id!")
+    return redirect(url_for("main.movies"))
