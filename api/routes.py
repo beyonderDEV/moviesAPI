@@ -1,6 +1,9 @@
 from flask import Blueprint, jsonify, request, flash, redirect, render_template, redirect, url_for
+
 from . import db
+
 from .models import Movie
+
 main = Blueprint('main', __name__)
 
 
@@ -22,7 +25,6 @@ def add_movie_post():
     db.session.commit()
     return redirect(url_for('main.movies'))
  
-
 
 @main.route('/remove_movie/')
 def remove_movie():
@@ -84,3 +86,18 @@ def update_movie_post():
     else:
         print("There is no movie with such id!")
     return redirect(url_for("main.movies"))
+
+@main.route('/search')
+def search():
+    return render_template('search.html')
+
+@main.route('/search', methods=['POST'])
+def search_post():
+    q = request.form.get('q')
+    if q is not None:
+        res = Movie.query.whoosh_search(q).all()
+        movies = []
+        for movie in res:
+            movies.append({'title':movie.title, 'rating':movie.rating, 'desc': movie.description})
+        return jsonify({'result': movies})
+    return render_template('search.html')
