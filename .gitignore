@@ -2,3 +2,5 @@
 serialAPI
 api/database.db
 __pycache__
+venv
+whoosh
