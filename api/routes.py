@@ -1,9 +1,7 @@
 from flask import Blueprint, jsonify, request, redirect, render_template, \
                 url_for
-
 from . import db
-
-from .models import Movie
+from .models import Movie, Show, ShowSchema, Episode, EpisodeSchema
 
 main = Blueprint('main', __name__)
 
@@ -109,3 +107,11 @@ def search_post():
                                'desc': movie.description})
             return jsonify({'result': movies})
     return render_template('search.html')
+
+
+@main.route('/shows')
+def shows():
+    show = Show.query.all()
+    show_schema = ShowSchema(many=True)
+    res = show_schema.dump(show)
+    return jsonify({'shows': res})
